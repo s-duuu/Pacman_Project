@@ -182,23 +182,25 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     visited = []
     actions = []
     pq = util.PriorityQueue()
-    pq.push((root, [], 1), 0)
+    pq.push((root, [], 0), 1)
 
     while pq.isEmpty() != True:
         top = pq.pop()
-        visited.append(top[0])
 
         if problem.isGoalState(top[0]):
-            actions = top[1]
-            break
+            return top[1]
         
-        children = problem.expand(top[0])
-        for child in children:
-            if child[0] not in visited:
-                total_cost = problem.getCostOfActionSequence(top[1]+[child[1]]) + heuristic(child[0], problem)
-                pq.push((child[0], top[1]+[child[1]], 1), total_cost)
+        if top[0] not in visited:
+            visited.append(top[0])
 
-    return actions
+            children = problem.expand(top[0])
+            for child in children:
+                if child[0] not in visited:
+                    
+                    total_cost = problem.getCostOfActionSequence(top[1]+[child[1]]) + heuristic(child[0], problem)
+                    pq.push((child[0], top[1]+[child[1]], 1), total_cost)
+
+    return []
 
 # Abbreviations
 bfs = breadthFirstSearch

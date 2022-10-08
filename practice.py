@@ -1,8 +1,8 @@
-top , right = 10, 10
-corners = ((1,1), (1,top), (right, 1), (right, top))
 
-if corners[0] == corners[1] == corners[2] == corners[3] == True:
-    print("Yes")
+a = [(1,1),(1,2),True,(1,3),True]
+b = []
+for i in range(len(a)):
+    if type(a[i]) == tuple:
+        b.append(a[i])
 
-else:
-    print("No")
+print(b)

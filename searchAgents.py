@@ -351,7 +351,7 @@ class CornersProblem(search.SearchProblem):
             # You should call getActions, getActionCost, and getNextState.
             "*** YOUR CODE HERE ***"
             nextState = self.getNextState(state, action)
-            cost = self.getActionCost(state, action, nextState)
+            cost = 1
             children.append( (nextState, action, cost) )
 
         self._expanded += 1 # DO NOT CHANGE
@@ -419,23 +419,28 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    from util import PriorityQueue
+    cur_position_state = state[0]
+    cur_corner_state = state[1]
 
-    cur_x, cur_y = state[0][0], state[0][1]
+    corners_candidates = []
+
     result = 0
-    pq = PriorityQueue()
 
-    i = 0
-    for corner in corners:
-        if state[1][i] != True:
-            pq.push(corner, ((corner[0] - cur_x)**2 + (corner[1] - cur_y)**2)**0.5)
-        i += 1
-
-    while pq.isEmpty() != True:
-        top_x, top_y = pq.pop()
-        result += ((cur_x - top_x)**2 + (cur_y - top_y)**2)**0.5
-        cur_x, cur_y = top_x, top_y
-
+    for i in range(len(cur_corner_state)):
+        if type(cur_corner_state[i]) == tuple:
+            corners_candidates.append(cur_corner_state[i])
+    
+    while len(corners_candidates):
+        candidates = []
+        for candidate in corners_candidates:
+            distance = util.manhattanDistance(cur_position_state, candidate)
+            candidates.append((distance, candidate))
+        
+        min_value_distance, min_value_corner = min(candidates)
+        result += min_value_distance
+        cur_position_state = min_value_corner
+        corners_candidates.remove(min_value_corner)
+    
     return result
     # return 0 # Default to trivial solution
 
