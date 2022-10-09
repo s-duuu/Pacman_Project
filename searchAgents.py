@@ -465,7 +465,9 @@ class FoodSearchProblem:
         self.startingGameState = startingGameState
         self._expanded = 0 # DO NOT CHANGE
         self.heuristicInfo = {} # A dictionary for the heuristic to store information
+        self.food_pos = startingGameState.getFood().asList()
 
+        
     def getStartState(self):
         return self.start
 
@@ -558,7 +560,22 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    result = 0
+    candidates = []
+    next_food = [0]
+    food_list = foodGrid.asList()
+    for food in food_list:
+        candidates.append(mazeDistance(position, food, problem.startingGameState))
+        for next in food_list:
+            next_food.append(mazeDistance(food, next, problem.startingGameState))
+    
+    if len(candidates) != 0:
+        result += min(candidates) + max(next_food)
+    else:
+        result += max(next_food)
+    
+    return result
+
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -589,7 +606,9 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        actions = search.bfs(problem)
+
+        return actions
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -625,6 +644,12 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x,y = state
 
         "*** YOUR CODE HERE ***"
+        food_list = self.food.asList()
+        if state in food_list:
+            return True
+        
+        else:
+            return False
         util.raiseNotDefined()
 
 def mazeDistance(point1, point2, gameState):
