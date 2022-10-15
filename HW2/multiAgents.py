@@ -43,6 +43,7 @@ class ReflexAgent(Agent):
 
         # Choose one of the best actions
         scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
+        
         bestScore = max(scores)
         bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
         chosenIndex = random.choice(bestIndices) # Pick randomly among the best
@@ -74,8 +75,49 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
+        import math
 
-        return childGameState.getScore()
+        food_list = newFood.asList()
+        distance_list = []
+        food_distance_list = [1]
+
+        weight1 = 0.1
+        weight2 = 0.6
+        weight3 = 1
+
+        first_score = 0
+        sum = 0
+
+        for ghost_state in newGhostStates:
+            distance_list.append(manhattanDistance(newPos, ghost_state.getPosition()))
+        
+        # for scare_weight in newScaredTimes:
+        #     print("Scare weight : ", scare_weight)
+        #     scare_weight_list.append(40-scare_weight)
+
+        for i in range(len(distance_list)):
+            sum += (distance_list[i]) * weight1
+
+        first_score += sum
+
+        for food in food_list:
+            food_distance_list.append(manhattanDistance(newPos, food))
+        
+        sum += math.exp(1/min(food_distance_list)) * weight2
+
+        second_score = math.exp(1/min(food_distance_list)) * weight2
+        third_score = 0
+        if newPos in food_list:
+            third_score = 1
+            sum += weight3
+        print("-----food list-----")
+        print(food_list)
+        print("Pacman position : ", newPos)
+        print("First score : ", first_score)
+        print("Second score : ", second_score)
+        print("Third score : ", third_score)
+        print("Total score : ", sum)
+        return sum
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -136,7 +178,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        
         util.raiseNotDefined()
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
