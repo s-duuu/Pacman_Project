@@ -79,11 +79,13 @@ class ReflexAgent(Agent):
 
         food_list = newFood.asList()
         distance_list = []
-        food_distance_list = [1]
+        scare_weight_list = []
+        food_distance_list = []
 
-        weight1 = 0.1
-        weight2 = 0.6
-        weight3 = 1
+        weight1 = 0.3
+        weight2 = 0.3
+        weight3 = 7
+        weight4 = 10
 
         first_score = 0
         sum = 0
@@ -91,31 +93,35 @@ class ReflexAgent(Agent):
         for ghost_state in newGhostStates:
             distance_list.append(manhattanDistance(newPos, ghost_state.getPosition()))
         
-        # for scare_weight in newScaredTimes:
-        #     print("Scare weight : ", scare_weight)
-        #     scare_weight_list.append(40-scare_weight)
+        for scare_weight in newScaredTimes:
+            print("Scare weight : ", scare_weight)
+            scare_weight_list.append(scare_weight)
 
         for i in range(len(distance_list)):
-            sum += (distance_list[i]) * weight1
+            first_score += (distance_list[i] * weight1 + scare_weight_list[i] * weight2)
 
-        first_score += sum
+        sum += first_score
 
         for food in food_list:
             food_distance_list.append(manhattanDistance(newPos, food))
         
-        sum += math.exp(1/min(food_distance_list)) * weight2
+        if len(food_distance_list) == 0:
+            second_score = 100
+        else: 
+            second_score = 1/min(food_distance_list)
 
-        second_score = math.exp(1/min(food_distance_list)) * weight2
-        third_score = 0
-        if newPos in food_list:
-            third_score = 1
-            sum += weight3
+        sum += second_score * weight3
+
+        third_score = 100 - len(food_list)
+        sum += third_score *weight4
+        
         print("-----food list-----")
         print(food_list)
         print("Pacman position : ", newPos)
-        print("First score : ", first_score)
-        print("Second score : ", second_score)
-        print("Third score : ", third_score)
+        print("Ghost position : ", ghost_state.getPosition())
+        print("Ghost avoidance score : ", first_score)
+        print("Next food distance score : ", second_score * weight3)
+        print("Current left food score : ", third_score * weight4)
         print("Total score : ", sum)
         return sum
 
