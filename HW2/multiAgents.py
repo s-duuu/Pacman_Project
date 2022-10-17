@@ -75,16 +75,13 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-        import math
 
         food_list = newFood.asList()
         distance_list = []
         scare_weight_list = []
         food_distance_list = []
 
-        weight1 = 0.3
-        weight2 = 0.3
-        weight3 = 7
+        weight3 = 10
         weight4 = 10
 
         first_score = 0
@@ -98,7 +95,14 @@ class ReflexAgent(Agent):
             scare_weight_list.append(scare_weight)
 
         for i in range(len(distance_list)):
-            first_score += (distance_list[i] * weight1 + scare_weight_list[i] * weight2)
+            if scare_weight_list[i] != 0 and distance_list[i] > scare_weight_list[i] + 2:
+                weight1 = 0.3
+                weight2 = 0.3
+                first_score += ((max(distance_list) - distance_list[i]) * weight1)
+            else:
+                weight1 = 0.3
+                weight2 = 0.3
+                first_score += (distance_list[i] * weight1)
 
         sum += first_score
 
