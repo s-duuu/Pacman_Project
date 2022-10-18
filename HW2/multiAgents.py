@@ -75,58 +75,48 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-
+        Ghost_pos = []
         food_list = newFood.asList()
-        distance_list = []
-        scare_weight_list = []
-        food_distance_list = []
+        food_distance = [101]
+        weight_list = [0.3, 0.3, 1.8]
 
-        weight3 = 10
-        weight4 = 10
-
-        first_score = 0
-        sum = 0
-
-        for ghost_state in newGhostStates:
-            distance_list.append(manhattanDistance(newPos, ghost_state.getPosition()))
+        for ghost in newGhostStates:
+            Ghost_pos.append(ghost.getPosition())
         
-        for scare_weight in newScaredTimes:
-            print("Scare weight : ", scare_weight)
-            scare_weight_list.append(scare_weight)
-
-        for i in range(len(distance_list)):
-            if scare_weight_list[i] != 0 and distance_list[i] > scare_weight_list[i] + 2:
-                weight1 = 0.3
-                weight2 = 0.3
-                first_score += ((max(distance_list) - distance_list[i]) * weight1)
+        
+        # First condition
+        f1 = 0
+        for i in range(len(Ghost_pos)):
+            if newScaredTimes[i] > 2:
+                continue
             else:
-                weight1 = 0.3
-                weight2 = 0.3
-                first_score += (distance_list[i] * weight1)
-
-        sum += first_score
+                f1 += manhattanDistance(newPos, Ghost_pos[i])
 
         for food in food_list:
-            food_distance_list.append(manhattanDistance(newPos, food))
+            food_distance.append(manhattanDistance(newPos, food))
         
-        if len(food_distance_list) == 0:
-            second_score = 100
-        else: 
-            second_score = 1/min(food_distance_list)
+        # Second condition
+        min_dis = min(food_distance)
+        f2 = 30 - min_dis
+        if 30 - min_dis < 0:
+            f2 = 100
 
-        sum += second_score * weight3
+        # Third condition
+        updated_food_len = len(food_list)
+        f3 = 100 - updated_food_len
 
-        third_score = 100 - len(food_list)
-        sum += third_score *weight4
+        sum = f1*weight_list[0] + f2*weight_list[1] + f3*weight_list[2]
         
-        print("-----food list-----")
-        print(food_list)
-        print("Pacman position : ", newPos)
-        print("Ghost position : ", ghost_state.getPosition())
-        print("Ghost avoidance score : ", first_score)
-        print("Next food distance score : ", second_score * weight3)
-        print("Current left food score : ", third_score * weight4)
-        print("Total score : ", sum)
+        print("--------------")
+        print("<Pacman> : ", newPos)
+        print("condition 1 (Ghost avoid) : ", f1)
+        print("condition 2 (min distance to food) : ", f2)
+        print("condition 3 (num of rest food) : ", f3)
+        print("First score : ", f1*weight_list[0])
+        print("Second score : ", f2*weight_list[1])
+        print("Third score : ", f3*weight_list[1])
+        print("!!!Total score!!! : ", sum)
+
         return sum
 
 def scoreEvaluationFunction(currentGameState):
