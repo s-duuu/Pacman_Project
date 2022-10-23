@@ -156,7 +156,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
         def minimax_value(gameState, agentIndex, depth):
-
             if gameState.isWin() or gameState.isLose() or depth == self.depth:
                 return self.evaluationFunction(gameState)
             
@@ -192,7 +191,63 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        def max_value(gameState, agentIndex, depth, a, b):
+            v = -5000000
+            next_agent = agentIndex + 1
+            for successor in gameState.getLegalActions(agentIndex):
+                v = max(v, calculate(gameState.getNextState(agentIndex, successor), next_agent, depth, a, b))
+                if v > b:
+                    return v
+                a = max(a, v)
+
+            return v
+        
+        def min_value(gameState, agentIndex, depth, a, b):
+            next_agent = agentIndex + 1
+            if gameState.getNumAgents() == next_agent:
+                next_agent = 0
+            if next_agent == 0:
+                depth += 1
+            
+            v = 5000000
+            for successor in gameState.getLegalActions(agentIndex):
+                v = min(v, calculate(gameState.getNextState(agentIndex, successor), next_agent, depth, a, b))
+                if v < a:
+                    return v
+                b = min(b, v)
+            
+            return v
+
+        def calculate(gameState, agentIndex, depth, a, b):
+            if gameState.isWin() or gameState.isLose() or depth == self.depth:
+                return self.evaluationFunction(gameState)
+            
+            if agentIndex == 0:
+                return max_value(gameState, agentIndex, depth, a, b)
+            
+            else:
+                return min_value(gameState, agentIndex, depth, a, b)
+            
+        utility = -5000000
+        result_action = "STOP"
+        a = -5000000
+        b = 5000000
+
+        for action in gameState.getLegalActions(0):
+            ghost_score = calculate(gameState.getNextState(0, action), 1, 0, a, b)
+
+            if ghost_score > utility:
+                utility = ghost_score
+                result_action = action
+            
+            if utility > b:
+                return utility
+            
+            a = max(a, utility)
+        
+        return result_action
+
+
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
