@@ -173,12 +173,12 @@ class MinimaxAgent(MultiAgentSearchAgent):
         
         import math
 
-        max_val = float(-math.inf)
+        max_val = -5000000
         max_action = "STOP"
 
         for action in gameState.getLegalActions(0):
             score = minimax_value(gameState.getNextState(0, action), 1, 0)
-            if score > max_val or max_val == float(-math.inf):
+            if score > max_val or max_val == -5000000:
                 max_val = score
                 max_action = action
 
