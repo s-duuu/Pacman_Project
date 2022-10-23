@@ -75,49 +75,26 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-        Ghost_pos = []
         food_list = newFood.asList()
-        food_distance = [101]
-        weight_list = [0.3, 0.3, 1.8]
-
-        for ghost in newGhostStates:
-            Ghost_pos.append(ghost.getPosition())
-        
-        
-        # First condition
-        f1 = 0
-        for i in range(len(Ghost_pos)):
-            if newScaredTimes[i] > 2:
-                continue
-            else:
-                f1 += manhattanDistance(newPos, Ghost_pos[i])
+        min_food_dis = -1
 
         for food in food_list:
-            food_distance.append(manhattanDistance(newPos, food))
+            distance = util.manhattanDistance(newPos, food)
+            if min_food_dis >= distance or min_food_dis == -1:
+                min_food_dis = distance
         
-        # Second condition
-        min_dis = min(food_distance)
-        f2 = 30 - min_dis
-        if 30 - min_dis < 0:
-            f2 = 100
+        ghost_dis = 1
+        ghost_flag = 0
 
-        # Third condition
-        updated_food_len = len(food_list)
-        f3 = 100 - updated_food_len
+        for ghost_state in newGhostStates:
+            ghost_pos = ghost_state.getPosition()
+            dis = util.manhattanDistance(newPos, ghost_pos)
+            ghost_dis += dis
 
-        sum = f1*weight_list[0] + f2*weight_list[1] + f3*weight_list[2]
-        
-        print("--------------")
-        print("<Pacman> : ", newPos)
-        print("condition 1 (Ghost avoid) : ", f1)
-        print("condition 2 (min distance to food) : ", f2)
-        print("condition 3 (num of rest food) : ", f3)
-        print("First score : ", f1*weight_list[0])
-        print("Second score : ", f2*weight_list[1])
-        print("Third score : ", f3*weight_list[1])
-        print("!!!Total score!!! : ", sum)
+            if dis <= 1:
+                ghost_flag += 1
 
-        return sum
+        return childGameState.getScore() + (1/float(min_food_dis)) - (1/float(ghost_dis)) - ghost_flag
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -178,6 +155,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
+        
         util.raiseNotDefined()
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
