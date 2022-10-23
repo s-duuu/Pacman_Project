@@ -160,11 +160,12 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 return self.evaluationFunction(gameState)
             
             if agentIndex == 0:
-                return max(minimax_value(gameState.getNextState(agentIndex, action), agentIndex + 1, depth) for action in gameState.getLegalActions(agentIndex))
+                next_agent = agentIndex + 1
+                return max(minimax_value(gameState.getNextState(agentIndex, action), next_agent, depth) for action in gameState.getLegalActions(agentIndex))
 
             else:
                 next_agent = agentIndex + 1
-                if gameState.getNumAgents() == next_agent:
+                if  next_agent == gameState.getNumAgents():
                     next_agent = 0
                 if next_agent == 0:
                     depth += 1
@@ -199,12 +200,11 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 if v > b:
                     return v
                 a = max(a, v)
-
             return v
         
         def min_value(gameState, agentIndex, depth, a, b):
             next_agent = agentIndex + 1
-            if gameState.getNumAgents() == next_agent:
+            if  next_agent == gameState.getNumAgents():
                 next_agent = 0
             if next_agent == 0:
                 depth += 1
@@ -262,7 +262,35 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         legal moves.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        def expectimax_value(gameState, agentIndex, depth):
+
+            if gameState.isWin() or gameState.isLose() or depth == self.depth:
+                return self.evaluationFunction(gameState)
+            
+            if agentIndex == 0:
+                next_agent = agentIndex + 1
+                return max(expectimax_value(gameState.getNextState(agentIndex, action), next_agent, depth) for action in gameState.getLegalActions(agentIndex))
+            
+            else:
+                next_agent = agentIndex + 1
+                if next_agent == gameState.getNumAgents():
+                    next_agent = 0
+                if next_agent == 0:
+                    depth += 1
+                
+                return sum(expectimax_value(gameState.getNextState(agentIndex, action), next_agent, depth) for action in gameState.getLegalActions(agentIndex)) / float(len(gameState.getLegalActions(agentIndex)))
+
+        max_val = -5000000
+        max_action = "STOP"
+        
+        for action in gameState.getLegalActions(0):
+            score = expectimax_value(gameState.getNextState(0, action), 1, 0)
+            if score > max_val or max_val == -5000000:
+                max_val = score
+                max_action = action
+
+        return max_action
+        
 
 def betterEvaluationFunction(currentGameState):
     """
@@ -272,6 +300,7 @@ def betterEvaluationFunction(currentGameState):
     DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
+    
     util.raiseNotDefined()    
 
 # Abbreviation
