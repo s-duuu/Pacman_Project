@@ -170,8 +170,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 if next_agent == 0:
                     depth += 1
                 return min(minimax_value(gameState.getNextState(agentIndex, action), next_agent, depth) for action in gameState.getLegalActions(agentIndex))
-        
-        import math
 
         max_val = -5000000
         max_action = "STOP"
