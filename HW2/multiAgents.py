@@ -340,25 +340,31 @@ def betterEvaluationFunction(currentGameState):
     close_ghost = 0
     food_list = Food.asList()
     min_food_dis = float(math.inf)
-    min_capsule_dis = float(math.inf)
+    left_capsule = len(Capsules) + 1
     ghost_idx = 0
-    ghost_num = len(Ghost_states)+1
+    min_capsule_dis = float(math.inf)
+
+    parameter_5 = 0
 
     # 1st, 2nd parameter : sum of square of distance to ghosts, too close ghost
     # threshold of 2nd parameter = 5
     for ghost in Ghost_states:
         ghost_pos = ghost.getPosition()
         
-        if Scared_times[ghost_idx] < util.manhattanDistance(Pacman_pos, ghost_pos):
-            ghost_num -= 1
-            dis_square = util.manhattanDistance(Pacman_pos, ghost_pos) ** 2
-            ghost_dis_square_sum += dis_square
+        for capsule in Capsules:
+            if util.manhattanDistance(Pacman_pos, capsule) < min_capsule_dis:
+                min_capsule_dis = util.manhattanDistance(Pacman_pos, capsule)
 
-            if dis_square <= 2:
-                close_ghost += 1
+        dis_square = util.manhattanDistance(Pacman_pos, ghost_pos) ** 2
+        ghost_dis_square_sum += dis_square
+
+        if dis_square <= 5:
+            close_ghost += 1
+            parameter_5 = min_capsule_dis
+
         ghost_idx += 1
     
-    parameter_1 = float(1/ghost_dis_square_sum)
+    parameter_1 = float(2/ghost_dis_square_sum)
     parameter_2 = float(close_ghost)
 
     # 3rd parameter : minimum distance to food 
@@ -366,24 +372,21 @@ def betterEvaluationFunction(currentGameState):
         distance = util.manhattanDistance(Pacman_pos, food)
         if distance < min_food_dis:
             min_food_dis = distance
-    parameter_3 = float(10/min_food_dis)
+    parameter_3 = float(3/min_food_dis)
 
     # 4th parameter : minimum distance to capsule
-    for capsule in Capsules:
-        distance = util.manhattanDistance(Pacman_pos, capsule)
-        if distance < min_capsule_dis:
-            min_capsule_dis = distance
-    parameter_4 = float(10/min_capsule_dis)
+    parameter_4 = float(3/left_capsule)
 
-    parameter_5 = float(1/ghost_num)
-    print("-----------------------")
-    print("<Pacman> : ", Pacman_pos)
-    print("1 : ", parameter_1)
-    print("2 : ", parameter_2)
-    print("3 : ", parameter_3)
-    print("4 : ", parameter_4)
-    print("5 : ", parameter_5)
-    print("Total : ", currentGameState.getScore() - parameter_1 - parameter_2 + parameter_3 + parameter_4 + parameter_5)
+
+    # Check pacman positon, 1~5 parameters, total score.
+    # print("-----------------------")
+    # print("<Pacman> : ", Pacman_pos)
+    # print("1 : ", parameter_1)
+    # print("2 : ", parameter_2)
+    # print("3 : ", parameter_3)
+    # print("4 : ", parameter_4)
+    # print("Total : ", currentGameState.getScore() - parameter_1 - parameter_2 + parameter_3 + parameter_4)
+
     return currentGameState.getScore() - parameter_1 - parameter_2 + parameter_3 + parameter_4 + parameter_5
 
 # Abbreviation
