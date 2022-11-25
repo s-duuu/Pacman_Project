@@ -117,20 +117,16 @@ def joinFactors(factors):
     
         joined = factor.variableDomainsDict()
     
-    joinedFactor = Factor(set_of_unconditioned, set_of_conditioned, joined)
+    joinFactor = Factor(set_of_unconditioned, set_of_conditioned, joined)
 
-    assignments = joinedFactor.getAllPossibleAssignmentDicts()
-
-    for assignment in assignments:
-        joinedFactor.setProbability(assignment, 1.0)
+    for assignment in joinFactor.getAllPossibleAssignmentDicts():
+        joinFactor.setProbability(assignment, 1)
 
         for element in factors:
-            probFactor = joinedFactor.getProbability(assignment)
-            probelement = element.getProbability(assignment)
 
-            joinedFactor.setProbability(assignment, probFactor * probelement)
+            joinFactor.setProbability(assignment, joinFactor.getProbability(assignment) * element.getProbability(assignment))
     
-    return joinedFactor
+    return joinFactor
 
     "*** END YOUR CODE HERE ***"
 
@@ -181,7 +177,26 @@ def eliminateWithCallTracking(callTrackingList=None):
                     "unconditionedVariables: " + str(factor.unconditionedVariables()))
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        set_of_conditioned = set()
+        set_of_unconditioned = set()
+
+        set_of_conditioned.update(factor.conditionedVariables())
+        set_of_unconditioned.update(factor.unconditionedVariables())
+
+        set_of_unconditioned.remove(eliminationVariable)
+
+        eliminatedFactor = Factor(set_of_unconditioned, set_of_conditioned, factor.variableDomainsDict())
+
+        for assignment in eliminatedFactor.getAllPossibleAssignmentDicts():
+            total = 0
+            for variable in factor.variableDomainsDict()[eliminationVariable]:
+                assignment[eliminationVariable] = variable
+                total += factor.getProbability(assignment)
+
+            eliminatedFactor.setProbability(assignment, total)
+
+        return eliminatedFactor
+
         "*** END YOUR CODE HERE ***"
 
     return eliminate
@@ -237,6 +252,35 @@ def normalize(factor):
                             str(factor))
 
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    total = 0
+
+    for assignment in factor.getAllPossibleAssignmentDicts():
+        total += factor.getProbability(assignment)
+    
+    if total == 0:
+        return None
+
+    set_of_conditioned = set()
+    set_of_unconditioned = set()
+
+    set_of_conditioned.update(factor.conditionedVariables())
+    set_of_unconditioned.update(factor.unconditionedVariables())
+
+    remove_list = []
+
+    for variable in set_of_unconditioned:
+        if len(factor.variableDomainsDict()[variable]) == 1:
+            set_of_conditioned.add(variable)
+            remove_list.append(variable)
+    
+    for i in range(len(remove_list)):
+        set_of_unconditioned.remove(remove_list[i])
+    
+    normalizedFactor = Factor(set_of_unconditioned, set_of_conditioned, variableDomainsDict)
+
+    for assignment in factor.getAllPossibleAssignmentDicts():
+        normalizedFactor.setProbability(assignment, factor.getProbability(assignment) / total)
+
+    return normalizedFactor
     "*** END YOUR CODE HERE ***"
 

@@ -285,7 +285,23 @@ def getMostLikelyFoodHousePosition(evidence, bayesNet, eliminationOrder):
     (This should be a very short method.)
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # print(bayesNet.variablesSet())
+
+    queryVariables = [FOOD_HOUSE_VAR, GHOST_HOUSE_VAR]
+
+    inference_factor = inference.inferenceByVariableElimination(bayesNet, queryVariables, evidence, eliminationOrder)
+
+    max_val = 0
+    max_result = {}
+
+    for assignment in inference_factor.getAllPossibleAssignmentDicts():
+
+        if inference_factor.getProbability(assignment) > max_val:
+            max_val = inference_factor.getProbability(assignment)
+            max_result = assignment
+    
+    return max_result
+
     "*** END YOUR CODE HERE ***"
 
 
@@ -388,7 +404,31 @@ class VPIAgent(BayesAgent):
         rightExpectedValue = 0
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        queryVariables = [FOOD_HOUSE_VAR, GHOST_HOUSE_VAR]
+
+        inference_factor = inference.inferenceByVariableElimination(self.bayesNet, queryVariables, evidence, eliminationOrder)
+
+        first_dict = {}
+        second_dict = {}
+
+        first_dict.update(evidence)
+        second_dict.update(evidence)
+
+        # print("----Check----")
+        # print(first_dict)
+
+        first_dict[FOOD_HOUSE_VAR] = TOP_LEFT_VAL
+        first_dict[GHOST_HOUSE_VAR] = TOP_RIGHT_VAL
+        
+        second_dict[FOOD_HOUSE_VAR] = TOP_RIGHT_VAL
+        second_dict[GHOST_HOUSE_VAR] = TOP_LEFT_VAL
+
+        probability1 = inference_factor.getProbability(first_dict) * WON_GAME_REWARD + inference_factor.getProbability(second_dict) * GHOST_COLLISION_REWARD
+        probability2 = inference_factor.getProbability(first_dict) * GHOST_COLLISION_REWARD + inference_factor.getProbability(second_dict) * WON_GAME_REWARD
+
+        return probability1, probability2
+        
+
         "*** END YOUR CODE HERE ***"
 
         return leftExpectedValue, rightExpectedValue
@@ -455,7 +495,11 @@ class VPIAgent(BayesAgent):
         expectedValue = 0
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        for prob, outcomeEvidence in self.getExplorationProbsAndOutcomes(evidence):
+            compute_result = self.computeEnterValues(outcomeEvidence, enterEliminationOrder)
+            expectedValue += prob * max(compute_result)
+
+        return expectedValue
         "*** END YOUR CODE HERE ***"
 
         return expectedValue
